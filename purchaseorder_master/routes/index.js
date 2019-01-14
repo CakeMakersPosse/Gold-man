@@ -7,7 +7,7 @@ router.get('/api/home', function(req, res) {
   res.send('Welcome!');
 });
 router.get('/api/secret', function(req, res) {
-  res.send('The password is potato');
+  res.send('The cake is a lie');
 });
 
 

@@ -3,19 +3,74 @@ var router = express.Router();
 const sqlite = require('sqlite3').verbose();
 var models = require('../models');
 
+/* REGISTER */
+router.get('/', function (req, res, next) {
+  res.send('respond with a resource');
+});
 
-// POST route to register a user
-router.post('/api/register', function (req, res) {
+router.get('/api/register', function (req, res, next) {
+  res.render('signup');
+});
+
+router.post('/api/register', function (req, res, next) {
   models.users
-    .findOrCreate({
+    .findOne({
       where: {
-        FirstName: req.body.firstName,
-        LastName: req.body.lastName,
-        Email: req.body.email,
-        Username: req.body.username,
-        Password: req.body.password
+        Username: req.body.username
       }
     })
-
+    .then(user => {
+      if (user) {
+        res.send('this user already exists');
+      } else {
+        models.users
+          .create({
+            FirstName: req.body.firstName,
+            LastName: req.body.lastName,
+            Email: req.body.email,
+            Username: req.body.username,
+            Password: hashedPassword
+          })
+      }
+    })
 });
+
+
+//PROFILE
+router.get('/profile/:id', function (req, res, next) {
+  models.users
+    .find({
+      where: {
+        UserId: req.params.id
+      }
+    })
+    .then(user => {
+      res.render('profile', {
+        FirstName: user.FirstName,
+        LastName: user.LastName,
+        Email: user.Email,
+        UserId: user.UserId,
+        Username: user.Username
+      });
+    });
+});
+
+//LOGIN
+router.get('/api/login', function (req, res, next) {
+  res.render('login');
+});
+
+router.post('/api/login', function (req, res, next) {
+  models.users
+    .findOne({
+      where: {
+        Username: req.body.username
+      }
+    })
+    .then(user => {
+      res.redirect('profile/' + user.UserId);
+    });
+});
+
+
 module.exports = router;
