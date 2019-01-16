@@ -29,7 +29,7 @@ router.post('/api/register', function (req, res, next) {
             LastName: req.body.lastName,
             Email: req.body.email,
             Username: req.body.username,
-            Password: hashedPassword
+            Password: req.body.password
           })
       }
     })
@@ -45,7 +45,7 @@ router.get('/profile/:id', function (req, res, next) {
       }
     })
     .then(user => {
-      res.render('profile', {
+      res.json({
         FirstName: user.FirstName,
         LastName: user.LastName,
         Email: user.Email,
@@ -64,11 +64,17 @@ router.post('/api/login', function (req, res, next) {
   models.users
     .findOne({
       where: {
-        Username: req.body.username
+        Username: req.body.username,
+        Password: req.body.password
       }
     })
     .then(user => {
+      if (user) {
       res.redirect('profile/' + user.UserId);
+      }
+      else{
+        res.send("Login Failed. Please try again.");
+      }
     });
 });
 
