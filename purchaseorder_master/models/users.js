@@ -1,3 +1,5 @@
+const bcrypt = require("bcryptjs");
+
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const users = sequelize.define('users', {
@@ -33,5 +35,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'PurchaseOrderId'
     });
   };
+
+  users.prototype.comparePassword = function (plainTextPassword) {
+    let user = this;
+    return bcrypt.compareSync(plainTextPassword, user.Password)
+  };
+
   return users;
 };

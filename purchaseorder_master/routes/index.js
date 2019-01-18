@@ -1,6 +1,7 @@
 const express = require('express');
 var router = express.Router();
 const sqlite = require('sqlite3').verbose();
+var models = require('../models');
 
 /* HOME GET */
 
@@ -29,8 +30,28 @@ router.get('/api/additem', function(req, res) {
   res.send('I am an add item route');
 });
 
-/* PURCHASE ORDER PAGE */
+/* ADD ITEM PAGE ROUTE */
 
+router.post('/api/additem', function (req, res, next) {
+  models.products
+    .findOrCreate({
+      where: {
+        ProductName: req.body.productName,
+        AmountOnHand: req.body.amountOnHand,
+        ProductId:req.body.productId
+      }
+    })
+});
+
+/* PURCHASE ORDER PAGE */
+router.post('/api/createorder', function (req, res, next) {
+  models.purchase_orders
+    .findOrCreate({
+      where: {
+        AmountOrdered: req.body.amountOrdered
+      }
+    })
+});
 
 
 module.exports = router;

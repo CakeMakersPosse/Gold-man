@@ -41,7 +41,7 @@ export default class Profile extends Component {
                 <Link to = {`/purchase`}><input type="submit" value="Purchase" className="button" onClick={this.purchase} /></Link>
             </div>
             <div>
-                <Link to = {`/home`}><input type="submit" value="LogOut" className="button" onClick={this.logout} /></Link>
+                <Link to = {`/`}><input type="submit" value="LogOut" className="button" onClick={this.logout} /></Link>
             </div>
         </div>
       );

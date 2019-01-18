@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const sqlite = require('sqlite3').verbose();
 var models = require('../models');
+const auth = require('../config/auth');
 
 /* REGISTER */
 router.get('/', function (req, res, next) {
@@ -13,24 +14,42 @@ router.get('/api/register', function (req, res, next) {
 });
 
 router.post('/api/register', function (req, res, next) {
+  const hashedPassword = auth.hashPassword(req.body.password);
   models.users
-    .findOrCreate({
+    .findOne({
       where: {
-        FirstName: req.body.firstName,
-        LastName: req.body.lastName,
-        Email: req.body.email,
-        Username: req.body.username,
-        Password: req.body.password
+        Username: req.body.username
       }
     })
-    .spread(function(result, created) {
-      if (created) {
-        res.redirect('profile/' + result.UserId);
-      } else {
+    .then(user => {
+      if (user) {
         res.send('this user already exists');
+      } else {
+        models.users
+          .create({
+            FirstName: req.body.firstName,
+            LastName: req.body.lastName,
+            Email: req.body.email,
+            Username: req.body.username,
+            Password: hashedPassword
+          })
+          .then(createdUser => {
+            const isMatch = createdUser.comparePassword(req.body.password);
+
+            if (isMatch) {
+              const userId = createdUser.UserId;
+              console.log(userId);
+              const token = auth.signUser(createdUser);
+              res.cookie('jwt', token);
+              res.redirect('profile/' + userId);
+            } else {
+              console.error('not a match');
+            }
+          });
       }
     });
 });
+
 
 
 /* USER PROFILE */
@@ -59,29 +78,34 @@ router.get('/api/login', function (req, res, next) {
 });
 
 router.post('/api/login', function (req, res, next) {
-  models.users
-    .findOne({
-      where: {
-        Username: req.body.username,
-        Password: req.body.password,
-      }
-    })
-    .then(user => {
-      if (!user) {
-        res.send('Not in Database')
-      }
-      else {
-        res.send({
-          userdata: {
-            FirstName: user.FirstName,
-            LastName: user.LastName,
-            Email: user.Email,
-            UserId: user.UserId,
-            Username: user.Username
-          }
-        })
-      }
-    })
-})
+  const hashedPassword = auth.hashPassword(req.body.password);
+  models.users.findOne({
+    where: {
+      Username: req.body.username
+    }
+  }).then(user => {
+    const isMatch = user.comparePassword(req.body.password)
 
+    if (!user) {
+      return res.status(401).json({
+        message: "Login Failed"
+      });
+    }
+    if (isMatch) {
+      const userId = user.UserId
+      const token = auth.signUser(user);
+      res.cookie('jwt', token);
+      res.redirect('profile/' + userId)
+    } else {
+      console.log(req.body.password);
+      res.redirect('login')
+    }
+
+  });
+});
+
+router.get('/logout', function (req, res) {
+  res.cookie('jwt', null);
+  res.redirect('/');
+});
 module.exports = router;
