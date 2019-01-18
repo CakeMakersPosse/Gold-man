@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link, Route, Switch } from 'react-router-dom';
 import Home from './Home';
-import Secret from './Secret';
+import Profile from './Profile';
 
 export default class App extends Component {
   render() {
@@ -13,7 +13,7 @@ export default class App extends Component {
         </ul>
         <Switch>
           <Route path="/" exact component={Home} />
-          <Route path="/secret" component={Secret} />
+          <Route path="/profile" component={Profile} />
         </Switch>
       </div>
     );

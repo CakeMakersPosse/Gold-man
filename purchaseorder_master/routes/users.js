@@ -14,30 +14,27 @@ router.get('/api/register', function (req, res, next) {
 
 router.post('/api/register', function (req, res, next) {
   models.users
-    .findOne({
+    .findOrCreate({
       where: {
-        Username: req.body.username
+        FirstName: req.body.firstName,
+        LastName: req.body.lastName,
+        Email: req.body.email,
+        Username: req.body.username,
+        Password: req.body.password
       }
     })
-    .then(user => {
-      if (user) {
-        res.send('this user already exists');
+    .spread(function(result, created) {
+      if (created) {
+        res.redirect('profile/' + result.UserId);
       } else {
-        models.users
-          .create({
-            FirstName: req.body.firstName,
-            LastName: req.body.lastName,
-            Email: req.body.email,
-            Username: req.body.username,
-            Password: req.body.password
-          })
+        res.send('this user already exists');
       }
-    })
+    });
 });
 
 
-//PROFILE
-router.get('/profile/:id', function (req, res, next) {
+/* USER PROFILE */
+router.get('/api/profile/:id', function (req, res, next) {
   models.users
     .find({
       where: {
@@ -45,7 +42,7 @@ router.get('/profile/:id', function (req, res, next) {
       }
     })
     .then(user => {
-      res.json({
+      res.send({
         FirstName: user.FirstName,
         LastName: user.LastName,
         Email: user.Email,
@@ -55,7 +52,8 @@ router.get('/profile/:id', function (req, res, next) {
     });
 });
 
-//LOGIN
+
+/* USER LOGIN */
 router.get('/api/login', function (req, res, next) {
   res.render('login');
 });
@@ -65,18 +63,25 @@ router.post('/api/login', function (req, res, next) {
     .findOne({
       where: {
         Username: req.body.username,
-        Password: req.body.password
+        Password: req.body.password,
       }
     })
     .then(user => {
-      if (user) {
-      res.redirect('profile/' + user.UserId);
+      if (!user) {
+        res.send('Not in Database')
       }
-      else{
-        res.send("Login Failed. Please try again.");
+      else {
+        res.send({
+          userdata: {
+            FirstName: user.FirstName,
+            LastName: user.LastName,
+            Email: user.Email,
+            UserId: user.UserId,
+            Username: user.Username
+          }
+        })
       }
-    });
-});
-
+    })
+})
 
 module.exports = router;

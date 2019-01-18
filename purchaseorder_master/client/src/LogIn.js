@@ -1,37 +1,47 @@
 import React, { Component } from 'react';
+import { PostData } from './PostData';
+import { Link } from 'react-router-dom';
 
 export default class LogIn extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         //Set default message
         this.state = {
-            message: 'Loading...'
+            username: '',
+            password: '',
+            redirect: false
         }
+        this.login = this.login.bind(this);
+        this.onChange = this.onChange.bind(this);
     }
-    componentDidMount() {
-        //GET message from server using fetch api
-        fetch('/api/home')
-            .then(res => res.text())
-            .then(res => this.setState({ message: res }));
+
+    login() {
+        PostData('login', this.state).then((result) => {
+            let responseJSON = result;
+            console.log(responseJSON);
+        });
+    }
+
+    onChange(e) {
+        this.setState({ [e.target.name]: e.target.value });
+        console.log(this.state);
     }
     render() {
         return (
             <div>
                 <h1>Welcome! Please log in</h1>
-                <form id="signin" name="login" method="POST" action="/users/api/login">
                     <div>
                         <label htmlFor="name">Username: </label>
-                        <input type="text" name="username" required />
+                        <input type="text" name="username" onChange={this.onChange} required />
                     </div>
                     <div>
                         <label htmlFor="name">Password: </label>
-                        <input type="text" name="password" required />
+                        <input type="text" name="password" onChange={this.onChange} required />
                     </div>
                     <div>
-                        <button type="submit">Submit</button>
+                        <Link to = {`/profile`}><input type="submit" value="Login" className="button" onClick={this.login} /></Link>
                     </div>
-                </form>
             </div>
-            );
+        );
     }
 }
