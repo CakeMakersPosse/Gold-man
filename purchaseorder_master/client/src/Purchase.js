@@ -12,6 +12,7 @@ export default class Home extends Component {
     return (
       <div>
      <p>{this.state.message}</p>
+     
       </div>
     );
   }
