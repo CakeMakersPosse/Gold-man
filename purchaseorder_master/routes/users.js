@@ -3,6 +3,8 @@ var router = express.Router();
 const sqlite = require('sqlite3').verbose();
 var models = require('../models');
 const auth = require('../config/auth');
+const passport = require('passport');
+const connectEnsure = require('connect-ensure-login');
 
 /* REGISTER */
 router.get('/', function (req, res, next) {
@@ -50,25 +52,23 @@ router.post('/api/register', function (req, res, next) {
     });
 });
 
-
-
 /* USER PROFILE */
 router.get('/api/profile/:id', function (req, res, next) {
   models.users
-    .find({
+    .findOne({
       where: {
         UserId: req.params.id
       }
     })
     .then(user => {
-      res.send({
+      res.json({
         FirstName: user.FirstName,
         LastName: user.LastName,
         Email: user.Email,
         UserId: user.UserId,
         Username: user.Username
-      });
-    });
+      })
+    }) 
 });
 
 
@@ -95,17 +95,17 @@ router.post('/api/login', function (req, res, next) {
       const userId = user.UserId
       const token = auth.signUser(user);
       res.cookie('jwt', token);
-      res.redirect('profile/' + userId)
+      res.redirect('profile/' + userId);
+      console.log('-------' + userId);
     } else {
       console.log(req.body.password);
-      res.redirect('login')
+      res.send('login')
     }
 
   });
 });
 
 router.get('/logout', function (req, res) {
-  res.cookie('jwt', null);
-  res.redirect('/');
+  res.send('This is a logout');
 });
 module.exports = router;

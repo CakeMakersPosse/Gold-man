@@ -8,12 +8,6 @@ export default class SignUp extends Component {
             message: 'Loading...'
         }
     }
-    componentDidMount() {
-        //GET message from server using fetch api
-        fetch('/api/home')
-            .then(res => res.text())
-            .then(res => this.setState({ message: res }));
-    }
     render() {
         return (
             <div>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { PostData } from './PostData';
 import { Link } from 'react-router-dom';
+const axios = require('axios');
 
 export default class LogIn extends Component {
     constructor(props) {
@@ -9,23 +10,26 @@ export default class LogIn extends Component {
         this.state = {
             username: '',
             password: '',
+            email:'',
             redirect: false
         }
         this.login = this.login.bind(this);
         this.onChange = this.onChange.bind(this);
     }
 
-    login() {
-        PostData('login', this.state).then((result) => {
+    login(){
+        axios.post("http://localhost:3000/users/api/login",this.state).then((result) => {
             let responseJSON = result;
             console.log(responseJSON);
-        });
-    }
+            console.log(JSON.stringify(responseJSON.data.Email));
+    })}
 
     onChange(e) {
         this.setState({ [e.target.name]: e.target.value });
         console.log(this.state);
     }
+
+
     render() {
         return (
             <div>
