@@ -10,12 +10,9 @@ export default class Home extends Component {
       message: 'Loading...'
     }
   }
-  componentDidMount() {
-    //GET message from server using fetch api
-    fetch('/api/home')
-      .then(res => res.text())
-      .then(res => this.setState({ message: res }));
-  }
+  
+/*Home page displaying SignUp and LogIn Components */
+
   render() {
     return (
       <div>

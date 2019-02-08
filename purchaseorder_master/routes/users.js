@@ -39,11 +39,11 @@ router.post('/api/register', function (req, res, next) {
             const isMatch = createdUser.comparePassword(req.body.password);
 
             if (isMatch) {
-              const userId = createdUser.UserId;
-              console.log(userId);
+              const username = createdUser.Username;
+              console.log(username);
               const token = auth.signUser(createdUser);
               res.cookie('jwt', token);
-              res.redirect('profile/' + userId);
+              
             } else {
               console.error('not a match');
             }
@@ -53,11 +53,11 @@ router.post('/api/register', function (req, res, next) {
 });
 
 /* USER PROFILE */
-router.get('/api/profile/:id', function (req, res, next) {
+router.get('/api/profile/:username', function (req, res, next) {
   models.users
     .findOne({
       where: {
-        UserId: req.params.id
+        Username: req.params.username
       }
     })
     .then(user => {
@@ -68,7 +68,10 @@ router.get('/api/profile/:id', function (req, res, next) {
         UserId: user.UserId,
         Username: user.Username
       })
-    }) 
+    })
+
+    
+
 });
 
 
@@ -92,11 +95,11 @@ router.post('/api/login', function (req, res, next) {
       });
     }
     if (isMatch) {
-      const userId = user.UserId
+      const username = user.Username
       const token = auth.signUser(user);
       res.cookie('jwt', token);
-      res.redirect('profile/' + userId);
-      console.log('-------' + userId);
+      res.redirect('profile/' + username);
+      console.log('-------' + username);
     } else {
       console.log(req.body.password);
       res.send('login')
